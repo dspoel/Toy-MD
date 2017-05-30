@@ -22,15 +22,15 @@ def read_pdb(filename):
                 resnm.append(line[17:20])
                 resnr.append(int(line[22:27]))
                 if (len(line) >= 77):
-                    elem.append(line[76:78])
+                    elem.append(line[76:78].strip())
                 else:
-                    elem.append("  ")
+                    elem.append("")
             elif (line.find("CRYST1") == 0):
                 box.append(float(line[7:15]))
                 box.append(float(line[16:24]))
                 box.append(float(line[25:33]))
             elif (line.find("CONECT") == 0):
-                conect.append([int(line[7:12]), int(line[13:18])])
+                conect.append([int(line[7:12])-1, int(line[13:18])-1])
     finally:
         inputfile.close()
     return [ box, coords, atomnm, resnm, resnr, elem, conect ]
