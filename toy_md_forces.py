@@ -36,7 +36,7 @@ def bonds(box, coords, elem, conect, force):
         ddx       = dx1-bond_length[bond]
         ener      = 0.5*force_const[bond]*ddx**2
         energy   += ener
-        temporary = force_const[bond]*ddx/dx1
+        temporary = -force_const[bond]*ddx/dx1
         for m in range(3):
             force[c[0]][m] += temporary*dx[m]
             force[c[1]][m] -= temporary*dx[m]
