@@ -18,12 +18,7 @@ def inner_product(x):
         x2 += xx*xx
     return x2
 
-def bonds(box, coords, elem, conect, force):
-    bond_length = {}
-    bond_length["O-H"] = bond_length["H-O"] = 1
-    force_const = {}
-    force_const["O-H"] = force_const["H-O"] = 4000
-    
+def bonded_forces(box, coords, elem, conect, force, bond_length, force_const ):
     energy = 0
     for c in conect:
         dx   = distance_pbc(box, coords[c[0]], coords[c[1]])
@@ -40,13 +35,20 @@ def bonds(box, coords, elem, conect, force):
         for m in range(3):
             force[c[0]][m] += temporary*dx[m]
             force[c[1]][m] -= temporary*dx[m]
-    return energy
-        
-def calculate_forces(box, coords, elem, conect):
+    return [ energy, force ]
+
+def nonbonded_forces(box, coords, elem, conect, force, sigma, epsilon, charge):
+    energy = 0
+    return [ energy, force ]
+ 
+def calculate_forces(box, coords, elem, conect, ff):
     N = len(coords)
     force = []
     for i in range(N):
         force.append([0.0, 0.0, 0.0])
-    Vbond = bonds(box, coords, elem, conect, force)
-
-    return [ Vbond, force ]
+    [ Vbond, force ]    = bonded_forces(box, coords, elem, conect, force,
+                                        ff["bond_length"], ff["force_const"])
+    [ Vnonbond, force ] = nonbonded_forces(box, coords, elem, conect, force,
+                                           ff["sigma"], ff["epsilon"], ff["charge"])
+    
+    return [ Vbond+Vnonbond, force ]
