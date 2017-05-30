@@ -12,11 +12,15 @@ def distance_pbc(box, x1, x2):
             dx[m] += box[m]
     return dx
 
+def dot_product(x, y):
+    xy = 0;
+    N  = len(x)
+    for i in range(N):
+        xy += x[i]*y[i]
+    return xy
+
 def inner_product(x):
-    x2 = 0;
-    for xx in x:
-        x2 += xx*xx
-    return x2
+    return dot_product(x, x)
 
 def bonded_forces(box, coords, elem, conect, force, bond_length, force_const ):
     energy = 0
@@ -37,18 +41,43 @@ def bonded_forces(box, coords, elem, conect, force, bond_length, force_const ):
             force[c[1]][m] -= temporary*dx[m]
     return [ energy, force ]
 
-def nonbonded_forces(box, coords, elem, conect, force, sigma, epsilon, charge):
+def nonbonded_forces(box, coords, elem, exclude, force, sigma, epsilon, charge):
     energy = 0
+    N = len(coords)
+    # Physical constant 1/4 pi epsilon_0 in the right MD units
+    facel = 138.1
+    cutoff_squared = (min(box[0], min(box[1], box[2]))/2.2)**2
+    for i in range(N):
+        i1 = i+1
+        for j in range(i1, N):
+            if (not j in exclude[i]):
+               dx   = distance_pbc(box, coords[i], coords[j])
+               dx2  = inner_product(dx)
+               dx_1 = 1.0/math.sqrt(dx2)
+               if (dx2 < cutoff_squared):
+                   Ecoul = charge[elem[i]]*charge[elem[j]]*facel*dx_1
+                   Fcoul = Ecoul*dx_1
+                   epsilon_ij = math.sqrt(epsilon[elem[i]]*epsilon[elem[j]])
+                   sigma_ij   = 0.5*(sigma[elem[i]]+sigma[elem[j]])
+                   sr         = sigma_ij*dx_1
+                   sr6        = sr**6
+                   Evdw       = 4*epsilon_ij*(sr6**2 - sr6)
+                   Fvdw       = 4*epsilon_ij*((sr6*sr)**2 - sr6*sr**2)
+                   energy    += (Ecoul + Evdw)
+                   for m in range(3):
+                       dfm = (Fcoul+Fvdw)*dx[m]
+                       force[i][m] += dfm
+                       force[j][m] -= dfm  
     return [ energy, force ]
- 
-def calculate_forces(box, coords, elem, conect, ff):
+
+def calculate_forces(box, coords, elem, conect, exclude, ff):
     N = len(coords)
     force = []
     for i in range(N):
         force.append([0.0, 0.0, 0.0])
     [ Vbond, force ]    = bonded_forces(box, coords, elem, conect, force,
-                                        ff["bond_length"], ff["force_const"])
-    [ Vnonbond, force ] = nonbonded_forces(box, coords, elem, conect, force,
+                                        ff["bond_length"], ff["bond_force_const"])
+    [ Vnonbond, force ] = nonbonded_forces(box, coords, elem, exclude, force,
                                            ff["sigma"], ff["epsilon"], ff["charge"])
     
     return [ Vbond+Vnonbond, force ]

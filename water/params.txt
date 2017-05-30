@@ -1,0 +1,4 @@
+number-of-steps  1000 # Number of integration time steps
+time-step        0.0002  # Integration time step (picoseconds)
+temperature      300  # Simulation temperature
+output-frequency  5   # Store coordinates every N steps

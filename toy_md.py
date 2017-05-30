@@ -6,6 +6,7 @@ from toy_md_params      import *
 from toy_md_force_field import *
 from toy_md_files       import *
 from toy_md_forces      import *
+from toy_md_util        import *
 
 def parseArguments():
     parser = argparse.ArgumentParser()
@@ -35,22 +36,32 @@ if __name__ == '__main__':
 
     if (len(args.coordinates) > 0):
         [ box, coords, atomnm, resnm, resnr, elem, conect ] = read_pdb(args.coordinates)
+        # Add angles
+        conect = make_angles(conect)
+
+        # Generate intramolecular exclusions
+        exclude = make_exclusions(len(coords), conect)
+        
         # Make a velocities array
         velocities = []
         for i in range(len(coords)):
             velocities.append([0.0, 0.0, 0.0])
+
         # Get the force field
         ff = read_force_field(args.force_field)
+
         # Get shortcut for the masses
         masses = get_masses(elem, ff["mass"])
+
         # Open the trajectory file
         outputfile = open(args.trajectory, "w", encoding='utf-8')
         for step in range(int(md_params["number-of-steps"])):
-            [ epotential, forces ] = calculate_forces(box, coords, elem, conect, ff )
+            [ epotential, forces ] = calculate_forces(box, coords, elem, conect, exclude, ff )
             [ ekinetic, coords, velocities ] = integrate(box, coords, velocities, forces,
                                                          masses, float(md_params["time-step"]))
-            print("Epot  %10.3f  Ekin  %10.3f   Etot %10.3f" %
-              ( epotential, ekinetic, epotential+ekinetic) )
+            put_in_box(box, resnr, coords)
+            print("Step: %5d Epot  %10.3f  Ekin  %10.3f   Etot %10.3f" %
+              ( step, epotential, ekinetic, epotential+ekinetic) )
             if (step % int(md_params["output-frequency"]) == 0):
                 write_pdb_frame(outputfile, step, box, coords, atomnm, resnm, resnr, elem)
         outputfile.close()
