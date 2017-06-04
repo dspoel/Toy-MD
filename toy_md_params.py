@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 def check_parameters(md_params, filename):
-    necessary = [ "number-of-steps", "time-step", "temperature", "output-frequency" ]
+    necessary = [ "number-of-steps", "time-step", "temperature", "output-frequency", "tau-T" ]
     nfound = 0
     for n in necessary:
         if (not n in md_params):
             print("No parameter %s in %s" % ( n, filename ) )
-        nfound += 1
+        else:
+            nfound += 1
     if (nfound != len(necessary)):
         print("Not all parameters were found in %s, quitting" % ( filename ) )
         exit(0)

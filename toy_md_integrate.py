@@ -28,15 +28,22 @@ def put_in_box(box, resnr, coords):
                 for k in invres[i]:
                     coords[k][m] += box[m]
     
-def integrate(box, coords, velocities, forces, masses, time_step):
+def integrate(box, coords, velocities, forces, masses, time_step, lambda_T):
     N    = len(coords)
     ekin = 0
     for i in range(N):
         vel2 = 0
         for m in range(3):
-            velocities[i][m] += forces[i][m]*time_step/masses[i]
-            coords[i][m]     += velocities[i][m]*time_step
-            vel2             += velocities[i][m]**2
+            vnew              = lambda_T*(velocities[i][m] + forces[i][m]*time_step/masses[i])
+            coords[i][m]     += vnew*time_step
+            velocities[i][m]  = vnew
+            vel2             += vnew**2
         ekin += 0.5*masses[i] * vel2
     
     return [ ekin, coords, velocities ]
+
+def compute_lambda_T(T, T_reference, time_step, tau_T):
+    if (T == 0 or tau_T == 0):
+        return 1
+    # GROMACS 5.1 manual, Eqn. 3.45
+    return math.sqrt(1 + (time_step/tau_T)*(T_reference/T - 1))

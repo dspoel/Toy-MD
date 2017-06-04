@@ -1,4 +1,5 @@
 number-of-steps  200 # Number of integration time steps
 time-step        0.0005  # Integration time step (picoseconds)
 temperature      300  # Simulation temperature
+tau-T               0.01 # Temperature coupling time (picoseconds)
 output-frequency  5   # Store coordinates every N steps

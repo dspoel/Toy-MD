@@ -56,20 +56,31 @@ if __name__ == '__main__':
 
     # Open the trajectory file
     outputfile = open(args.trajectory, "w", encoding='utf-8')
+
+    # Initial Temperature coupling factor
+    lambda_T = 1.0
+
+    # Now loop over MD steps
     for step in range(int(md_params["number-of-steps"])):
         # Compute the forces
         [ epotential, forces ] = calculate_forces(box, coords, elem, conect, exclude, ff )
         
         # Step the coordinates
         [ ekinetic, coords, velocities ] = integrate(box, coords, velocities, forces,
-                                                         masses, float(md_params["time-step"]))
-            
-        # Put the coordinates back in the box
-        put_in_box(box, resnr, coords)
+                                                         masses, float(md_params["time-step"]), lambda_T)
 
         # Compute temperature
         T = get_temperature(len(coords), ekinetic)
         
+        # Compute new lambda_T
+        lambda_T = compute_lambda_T(T,
+                                    float(md_params["temperature"]),
+                                    float(md_params["time-step"]),
+                                    float(md_params["tau-T"]))
+        
+        # Put the coordinates back in the box
+        put_in_box(box, resnr, coords)
+
         # Print some stuff
         print("Step: %5d Epot  %10.3f  Ekin  %10.3f   Etot %10.3f  T %7.2f" %
               ( step, epotential, ekinetic, epotential+ekinetic, T) )

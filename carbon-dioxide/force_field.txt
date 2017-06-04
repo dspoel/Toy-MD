@@ -1,0 +1,10 @@
+bond C O        0.12  300000 # Atom 1 Atom 2 Bond-length (nm) Force-Constant (kJ/mol/nm^2)
+bond O O      0.24  100000
+sigma O          0.315  # nm
+sigma C          0.32
+epsilon O        0.64  # kJ/mol
+epsilon C        0.5
+mass C          12 
+mass O          16       
+charge C          0.4
+charge O          -0.2     
