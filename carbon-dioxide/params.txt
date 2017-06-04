@@ -1,4 +1,4 @@
-number-of-steps  1000 # Number of integration time steps
+number-of-steps  100 # Number of integration time steps
 time-step        0.001  # Integration time step (picoseconds)
 temperature      50  # Simulation temperature
 tau-T            0.01

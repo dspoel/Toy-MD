@@ -35,7 +35,7 @@ def read_pdb(filename):
         inputfile.close()
     return [ box, coords, atomnm, resnm, resnr, elem, conect ]
        
-def write_pdb_frame(file, step, box, coords, atomnm, resnm, resnr, elem):
+def write_pdb_frame(file, step, box, coords, atomnm, resnm, resnr, elem, conect):
     file.write("TITLE    t = %s\n" % ( step ))
     file.write("CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f P 1           1\n" %
                ( 10*box[0], 10*box[1], 10*box[2], 90, 90, 90 ))
@@ -47,6 +47,9 @@ def write_pdb_frame(file, step, box, coords, atomnm, resnm, resnr, elem):
                      10*coords[i][0], 10*coords[i][1], 10*coords[i][2],
                     1.0, 0.0, elem[i] ) )
     file.write("TER\n")
+    if (conect):
+        for c in conect:
+            file.write("CONECT%5d%5d\n" % ( c[0]+1, c[1]+1) )
     file.write("ENDMDL\n")
 
 def test_pdb():
@@ -54,7 +57,7 @@ def test_pdb():
 
     outputfile = open("water2.pdb", "w", encoding='utf-8')
     try:
-        write_pdb_frame(outputfile, 1, box, coords, atomnm, resnm, resnr, elem)
+        write_pdb_frame(outputfile, 1, box, coords, atomnm, resnm, resnr, elem, conect)
     finally:
         outputfile.close()
         

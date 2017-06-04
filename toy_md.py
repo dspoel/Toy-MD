@@ -12,6 +12,7 @@ def parseArguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--coordinates", dest="coordinates", help="Coordinate pdb file for reading",   type=str,    default=None)
     parser.add_argument("-o", "--trajectory",  dest="trajectory",  help="Output pdb file for writing",  type=str,    default="traj.pdb")
+    parser.add_argument("-w", "--outcoords", dest="outcoords", help="Coordinate pdb file for writing and restarting",   type=str,    default=None)
     parser.add_argument("-p", "--parameters",  dest="parameters",  help="Parameter file for reading",   type=str,    default=None)
     parser.add_argument("-ff", "--forcefield",  dest="forcefield",  help="Parameter file for reading",   type=str,    default=None)
     args = parser.parse_args()
@@ -38,7 +39,10 @@ if __name__ == '__main__':
     # Read input coordinates, atom name etc.
     [ box, coords, atomnm, resnm, resnr, elem, conect ] = read_pdb(args.coordinates)
     # Add angles
-    conect = make_angles(conect)
+    conect_orig = []
+    for c in conect:
+        conect_orig.append(c)
+    conect      = make_angles(conect)
 
     # Generate intramolecular exclusions
     exclude = make_exclusions(len(coords), conect)
@@ -85,8 +89,12 @@ if __name__ == '__main__':
         print("Step: %5d Epot  %10.3f  Ekin  %10.3f   Etot %10.3f  T %7.2f" %
               ( step, epotential, ekinetic, epotential+ekinetic, T) )
         if (step % int(md_params["output-frequency"]) == 0):
-            write_pdb_frame(outputfile, step, box, coords, atomnm, resnm, resnr, elem)
+            write_pdb_frame(outputfile, step, box, coords, atomnm, resnm, resnr, elem, None)
 
     # Done with the loop over steps, now close the file
     outputfile.close()
         
+    if (args.outcoords):
+        # Open the output coords file
+        outputfile = open(args.outcoords, "w", encoding='utf-8')
+        write_pdb_frame(outputfile, step, box, coords, atomnm, resnm, resnr, elem, conect_orig)
