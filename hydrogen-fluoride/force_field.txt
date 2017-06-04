@@ -1,0 +1,9 @@
+bond F H        0.1    400000 # Atom 1 Atom 2 Bond-length (nm) Force-Constant (kJ/mol/nm^2)
+sigma F          0.325  # nm
+sigma H          0.25
+epsilon F        0.64  # kJ/mol
+epsilon H        0
+mass H          1   # Dalton
+mass F          19       
+charge H          0.4   # electron
+charge F          -0.8     
