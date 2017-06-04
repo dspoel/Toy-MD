@@ -46,28 +46,34 @@ def nonbonded_forces(box, coords, elem, exclude, force, sigma, epsilon, charge):
     N = len(coords)
     # Physical constant 1/4 pi epsilon_0 in the right MD units
     facel = 138.1
-    cutoff_squared = (min(box[0], min(box[1], box[2]))/2.2)**2
+    cutoff_squared = (0.9*min(0.5*box[0], 0.5*min(box[1], box[2])))**2
+#    print("cutoff %.2f" % ( math.sqrt(cutoff_squared) ) )
     for i in range(N):
         i1 = i+1
         for j in range(i1, N):
             if (not j in exclude[i]):
-               dx   = distance_pbc(box, coords[i], coords[j])
-               dx2  = inner_product(dx)
-               dx_1 = 1.0/math.sqrt(dx2)
-               if (dx2 < cutoff_squared):
-                   Ecoul = charge[elem[i]]*charge[elem[j]]*facel*dx_1
-                   Fcoul = Ecoul*dx_1
-                   epsilon_ij = math.sqrt(epsilon[elem[i]]*epsilon[elem[j]])
-                   sigma_ij   = 0.5*(sigma[elem[i]]+sigma[elem[j]])
-                   sr         = sigma_ij*dx_1
-                   sr6        = sr**6
-                   Evdw       = 4*epsilon_ij*(sr6**2 - sr6)
-                   Fvdw       = 4*epsilon_ij*((sr6*sr)**2 - sr6*sr**2)
-                   energy    += (Ecoul + Evdw)
-                   for m in range(3):
-                       dfm = (Fcoul+Fvdw)*dx[m]
-                       force[i][m] += dfm
-                       force[j][m] -= dfm  
+                dx   = distance_pbc(box, coords[i], coords[j])
+                dx2  = inner_product(dx)
+                dx_1 = 1.0/math.sqrt(dx2)
+                if (dx2 < cutoff_squared):
+                   # print("pair %d %d distance %.3f" % ( i, j, math.sqrt(dx2) ) )
+                    Ecoul = charge[elem[i]]*charge[elem[j]]*facel*dx_1
+                    Fcoul = -Ecoul*dx_1
+                    epsilon_ij = math.sqrt(epsilon[elem[i]]*epsilon[elem[j]])
+                    if (epsilon_ij > 0):
+                        sigma_ij   = 0.5*(sigma[elem[i]]+sigma[elem[j]])
+                        sr         = sigma_ij*dx_1
+                        sr6        = sr**6
+                        Evdw       = 4*epsilon_ij*(sr6**2 - sr6)
+                        Fvdw       = 4*epsilon_ij*((sr6*sr)**2 - sr6*sr**2)
+                    else:
+                        Evdw       = 0
+                        Fvdw       = 0
+                    energy    += (Ecoul + Evdw)
+                    for m in range(3):
+                        dfm = (Fcoul+Fvdw)*dx[m]
+                        force[i][m] += dfm
+                        force[j][m] -= dfm  
     return [ energy, force ]
 
 def calculate_forces(box, coords, elem, conect, exclude, ff):
