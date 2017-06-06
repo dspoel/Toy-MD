@@ -46,4 +46,6 @@ def compute_lambda_T(T, T_reference, time_step, tau_T):
     if (T == 0 or tau_T == 0):
         return 1
     # GROMACS 5.1 manual, Eqn. 3.45
+    # Note this is the Berendsen temperature scaling that should
+    # not be used for production simulations
     return math.sqrt(1 + (time_step/tau_T)*(T_reference/T - 1))

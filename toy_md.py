@@ -86,8 +86,8 @@ if __name__ == '__main__':
         put_in_box(box, resnr, coords)
 
         # Print some stuff
-        print("Step: %5d Epot  %10.3f  Ekin  %10.3f   Etot %10.3f  T %7.2f" %
-              ( step, epotential, ekinetic, epotential+ekinetic, T) )
+        print("Step: %5d Epot %10.3f Ekin %10.3f Etot %10.3f T %7.2f lambda %.2f" %
+              ( step, epotential, ekinetic, epotential+ekinetic, T, lambda_T) )
         if (step % int(md_params["output-frequency"]) == 0):
             write_pdb_frame(outputfile, step, box, coords, atomnm, resnm, resnr, elem, None)
 

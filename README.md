@@ -10,7 +10,14 @@ Example for running:
 
 This will give you the command line help for the script.
 
-% ./toy_md.py -c carbon-dioxide/co2.pdb -p carbon-dioxide/params.txt
--f carbon-dioxide/force_field.txt -w co2-output.pdb
+% cd carbon-dioxide
+% ../toy_md.py -c co2.pdb -p params.txt
+-f force_field.txt -w co2-output.pdb
 
-Then open the resulting traj.pdb with a viewer of your choosing.
+And similar in the other directories.
+
+Then open the resulting traj.pdb with a viewer of your choosing, but you can
+use the simple PyMoL script for the purpose.
+
+Enjoy Toy-MD!
+
