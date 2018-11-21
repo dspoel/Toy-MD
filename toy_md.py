@@ -17,13 +17,13 @@ def parseArguments():
     parser.add_argument("-ff", "--forcefield",  dest="forcefield",  help="Parameter file for reading",   type=str,    default=None)
     args = parser.parse_args()
     if (not args.coordinates):
-        printf("Sorry but I need a coordinate file")
+        print("Sorry but I need a coordinate file")
         exit(0)
     if (not args.parameters):
-        printf("Sorry but I need a parameter file")
+        print("Sorry but I need a parameter file")
         exit(0)
     if (not args.forcefield):
-        printf("Sorry but I need a forcefield file")
+        print("Sorry but I need a forcefield file")
         exit(0)
         
     return args
