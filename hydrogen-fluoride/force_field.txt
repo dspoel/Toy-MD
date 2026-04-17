@@ -6,4 +6,4 @@ epsilon H        0
 mass H          1   # Dalton
 mass F          19       
 charge H          0.4   # electron
-charge F          -0.8     
+charge F          -0.4     
