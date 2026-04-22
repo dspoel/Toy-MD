@@ -17,7 +17,7 @@ if __name__ == "__main__":
     amplitude = 10.0 # kJ/mol
     beta      = 1.0/(BOLTZ*TEMPERATURE)
     print(f"Energy distribution witdh {amplitude} beta {beta}")
-    for nener in [ 100, 1000, 10000, 100000, 1000000 ]:
+    for nener in [ 10, 100, 1000, 10000, 100000, 1000000 ]:
         deltaF = []
         deltaE = []
         ntrial = 5
