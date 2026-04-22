@@ -22,3 +22,9 @@ use the simple PyMoL script for the purpose.
 
 Enjoy Toy-MD!
 
+# MD related educational scripts
+There are a few small scripts for educational purposes here as well.
+
+* maxwell.py will generate a Maxwell-Boltzmann velocity distribution and plot it
+* zwanzig.py will generate energy data sets and compute the Free energy according to the Zwanzig formula
+  
